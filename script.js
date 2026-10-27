@@ -26,7 +26,7 @@
   });
 
   // countdown to 27 Oct 2026, 08:00 WIB (UTC+7)
-  const target = new Date('2026-10-27T08:00:00+07:00').getTime();
+  const target = new Date('2026-10-31T08:00:00+07:00').getTime();
   function tick() {
     const diff = Math.max(0, target - Date.now());
     const d = Math.floor(diff / 86400000);
@@ -42,7 +42,7 @@
   tick();
   setInterval(tick, 1000);
 
-  // RSVP + wishes, kept in memory + localStorage (per-device convenience only)
+  const WHATSAPP_NUMBER = '6282140819412';
   const STORE_KEY = 'wedding-safri-fitri-wishes';
   let wishes = [];
   try { wishes = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch (e) { wishes = []; }
@@ -71,13 +71,24 @@
     const status = document.getElementById('rsvpStatus').value;
     const wish = document.getElementById('rsvpWish').value.trim();
     if (!name || !status) return;
-    wishes.push({ name: name, status: status === 'Hadir' ? 'Insya Allah hadir' : (status === 'Tidak Hadir' ? 'Berhalangan hadir' : 'Masih ragu'), wish: wish });
+    const statusLabel = status === 'Hadir' ? 'Insya Allah hadir' : (status === 'Tidak Hadir' ? 'Berhalangan hadir' : 'Masih ragu');
+    wishes.push({ name: name, status: statusLabel, wish: wish });
     try { localStorage.setItem(STORE_KEY, JSON.stringify(wishes)); } catch (e) {}
     renderWishes();
     this.reset();
     const note = document.getElementById('rsvpNote');
     note.hidden = false;
     setTimeout(() => { note.hidden = true; }, 4000);
+
+    // kirim konfirmasi ke WhatsApp (buka chat dengan pesan sudah terisi)
+    if (WHATSAPP_NUMBER && WHATSAPP_NUMBER !== '628123456789') {
+      let message = 'Assalamu\'alaikum, konfirmasi kehadiran undangan Safri & Fitri:\n\n'
+        + 'Nama: ' + name + '\n'
+        + 'Konfirmasi: ' + statusLabel;
+      if (wish) message += '\nUcapan & Doa: ' + wish;
+      const waUrl = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
+      window.open(waUrl, '_blank', 'noopener');
+    }
   });
 
   // music toggle (template only — ganti src audio di HTML dengan lagu Anda)
