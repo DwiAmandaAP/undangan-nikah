@@ -22,10 +22,11 @@
   }
   flipStage.addEventListener('click', toggleFlip);
   flipStage.addEventListener('keydown', function (e) {
+    const tag = e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return; // biarkan spasi/enter bekerja normal di form
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFlip(); }
   });
 
-  // countdown to 27 Oct 2026, 08:00 WIB (UTC+7)
   const target = new Date('2026-10-31T08:00:00+07:00').getTime();
   function tick() {
     const diff = Math.max(0, target - Date.now());
@@ -42,7 +43,10 @@
   tick();
   setInterval(tick, 1000);
 
-  const WHATSAPP_NUMBER = '6282140819412';
+  // RSVP + wishes, kept in memory + localStorage (per-device convenience only)
+  // Isi nomor WhatsApp tujuan di bawah ini, format internasional tanpa + atau 0 di depan.
+  // Contoh: nomor 0812-3456-7890 ditulis '628123456789'
+  const WHATSAPP_NUMBER = '628123456789';
   const STORE_KEY = 'wedding-safri-fitri-wishes';
   let wishes = [];
   try { wishes = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch (e) { wishes = []; }
@@ -80,8 +84,7 @@
     note.hidden = false;
     setTimeout(() => { note.hidden = true; }, 4000);
 
-    // kirim konfirmasi ke WhatsApp (buka chat dengan pesan sudah terisi)
-    if (WHATSAPP_NUMBER && WHATSAPP_NUMBER !== '628123456789') {
+    if (WHATSAPP_NUMBER && WHATSAPP_NUMBER !== '6282140819412') {
       let message = 'Assalamu\'alaikum, konfirmasi kehadiran undangan Safri & Fitri:\n\n'
         + 'Nama: ' + name + '\n'
         + 'Konfirmasi: ' + statusLabel;
@@ -91,7 +94,6 @@
     }
   });
 
-  // music toggle (template only — ganti src audio di HTML dengan lagu Anda)
   const audio = document.getElementById('bgAudio');
   const musicBtn = document.getElementById('musicToggle');
   musicBtn.addEventListener('click', function () {
